@@ -1,7 +1,6 @@
-import compile_pyteal
-
 from pyteal import *
 
+import compile_pyteal
 
 test_cases_good = [
     b"from pyteal import *\n\n\ndef approval():\n    return Approve()\n",

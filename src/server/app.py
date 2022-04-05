@@ -1,8 +1,7 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 import compile_pyteal
-
 
 app = Flask(__name__)
 CORS(app, resources=r"/*")
