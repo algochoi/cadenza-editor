@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, Response
+from flask import Flask, Response, jsonify, request
 from flask_cors import CORS
 
 import compile_pyteal

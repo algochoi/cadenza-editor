@@ -22,7 +22,7 @@ class SandboxAccount:
         kmd_client: KMDClient,
         wallet_name="unencrypted-default-wallet",
         wallet_password="",
-    ) -> List[str] | None:
+    ):
         wallets = kmd_client.list_wallets()
 
         handle = None
