@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 
 import compile_pyteal
@@ -15,6 +15,17 @@ def hello():
 
 @app.route("/compile", methods=["POST"])
 def compile():
+    file = request.files["file"]
+    body = file.read()
+    try:
+        compiled_source = compile_pyteal.raw_compile(body)
+        return Response(f"Compilation successful: {compiled_source}", status=200)
+    except Exception as e:
+        return Response("Bad Approval program; could not compile PyTeal", status=400)
+
+
+@app.route("/deploy", methods=["POST"])
+def deploy_app():
     file = request.files["file"]
     body = file.read()
     resp = compile_pyteal.raw_compile(body)
