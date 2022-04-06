@@ -31,7 +31,16 @@ const editorLib = {
 
         newLog.appendChild(newLogText);
         consoleLogList.appendChild(newLog);
-    }
+    },
+
+    clearConsole() {
+        consoleMessages.length = 0;
+
+        // Remove all elements in the log list
+        while (consoleLogList.firstChild) {
+            consoleLogList.removeChild(consoleLogList.firstChild);
+        }
+    },
 };
 
 
@@ -41,6 +50,12 @@ compileCodeBtn.addEventListener('click', () => {
     console.log(userCode);
 
     editorLib.outputConsole();
+});
+
+consoleLogList.addEventListener('dblclick', () => {
+    // Clear the logs if double clicked
+    console.log("Clear");
+    editorLib.clearConsole();
 });
 
 
