@@ -17,6 +17,11 @@ body {
     width: 100%;
 }
 
+h1 {
+    font-family: "Work Sans";
+    text-align: center;
+}
+
 .editor {
     height: 100%;
     width: 100%;
