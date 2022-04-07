@@ -73,7 +73,7 @@ compileCodeBtn.addEventListener('click', () => {
 
     console.log(userCode);
 
-    fetch("http://127.0.0.1:5000/compile", {
+    fetch("http://0.0.0.0:5000/compile", {
             body: JSON.stringify({
                 "body": userCode,
             }),
@@ -100,7 +100,7 @@ deployCodeBtn.addEventListener('click', () => {
 
     console.log(userCode);
 
-    fetch("http://127.0.0.1:5000/deploy", {
+    fetch("http://0.0.0.0:5000/deploy", {
             body: JSON.stringify({
                 "body": userCode,
             }),
