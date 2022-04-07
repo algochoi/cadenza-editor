@@ -14,7 +14,7 @@ def application(pyteal: Expr) -> str:
 
 
 # Creates a temp PyTeal file and saves to temp folder.
-def process_pyteal(raw_pyteal: bytes | str) -> str:
+def process_pyteal(raw_pyteal: bytes) -> str:
     global count
     decoded = raw_pyteal
     if isinstance(raw_pyteal, bytes):
@@ -26,7 +26,7 @@ def process_pyteal(raw_pyteal: bytes | str) -> str:
     return fname
 
 
-def raw_compile(raw_pyteal: bytes | str):
+def raw_compile(raw_pyteal: bytes):
     fname = process_pyteal(raw_pyteal)
 
     # Try compiling pyteal
