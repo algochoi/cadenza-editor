@@ -22,12 +22,16 @@ const editorLib = {
         editor.setValue(defaultCode)
     },
 
-    outputConsole() {
+    outputConsole(text) {
+        consoleMessages.push({
+            text
+        })
+
         const newLog = document.createElement('li');
         const newLogText = document.createElement('pre');
 
         newLogText.className = "log log--string";
-        newLogText.textContent = `> ${consoleMessages[0].item}`;
+        newLogText.textContent = `> ${consoleMessages[0].text}`;
 
         newLog.appendChild(newLogText);
         consoleLogList.appendChild(newLog);
@@ -49,7 +53,23 @@ compileCodeBtn.addEventListener('click', () => {
 
     console.log(userCode);
 
-    editorLib.outputConsole();
+    fetch("http://127.0.0.1:5000/compile", {
+            body: JSON.stringify({
+                "body": userCode,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Accept": "application/json",
+            },
+            method: "POST",
+            // mode: 'no-cors',
+        }).then(response => response.text())
+        .then(response => {
+            console.log(response)
+            editorLib.outputConsole(response)
+        });
 });
 
 consoleLogList.addEventListener('dblclick', () => {
