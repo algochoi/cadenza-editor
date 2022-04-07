@@ -1,4 +1,5 @@
 import importlib
+import os
 
 from pyteal import *
 
@@ -21,6 +22,14 @@ def process_pyteal(raw_pyteal: bytes) -> str:
         decoded = raw_pyteal.decode("utf-8")
     fname = f"temp_pyteal_{count%MAX_FILE_COUNT}"
     count += 1
+
+    # Create temp directory (mkdir -p)
+    try:
+        os.mkdir("temp")
+    except:
+        # Swallow error if temp dir already exists
+        pass
+
     with open(f"temp/{fname}.py", "w") as f:
         f.write(decoded)
     return fname
