@@ -1,6 +1,6 @@
-from flask import Flask, Response, jsonify, request
+from flask import Flask, Response, jsonify, request, render_template
 from flask_cors import CORS
-import json
+import json, os
 
 import compile_pyteal
 import sandbox_utils
@@ -23,6 +23,11 @@ class Account:
 
 # Generate new transient account pairs for every app deployment
 current_account = Account()
+
+
+@app.route("/")
+def render_main():
+    return render_template("index.html")
 
 
 @app.route("/hello")
