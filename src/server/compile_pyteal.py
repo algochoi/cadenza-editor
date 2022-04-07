@@ -14,9 +14,11 @@ def application(pyteal: Expr) -> str:
 
 
 # Creates a temp PyTeal file and saves to temp folder.
-def process_pyteal(raw_pyteal: bytes) -> str:
+def process_pyteal(raw_pyteal: bytes | str) -> str:
     global count
-    decoded = raw_pyteal.decode("utf-8")
+    decoded = raw_pyteal
+    if isinstance(raw_pyteal, bytes):
+        decoded = raw_pyteal.decode("utf-8")
     fname = f"temp_pyteal_{count%MAX_FILE_COUNT}"
     count += 1
     with open(f"temp/{fname}.py", "w") as f:
@@ -24,7 +26,7 @@ def process_pyteal(raw_pyteal: bytes) -> str:
     return fname
 
 
-def raw_compile(raw_pyteal: bytes):
+def raw_compile(raw_pyteal: bytes | str):
     fname = process_pyteal(raw_pyteal)
 
     # Try compiling pyteal

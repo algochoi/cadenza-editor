@@ -1,5 +1,6 @@
 from flask import Flask, Response, jsonify, request
 from flask_cors import CORS
+import json
 
 import compile_pyteal
 import sandbox_utils
@@ -19,6 +20,7 @@ class Account:
     def generate_transient_account(self, client):
         self.sk, self.pk = self.sandbox_account.get_funded_transient(client)
 
+
 # Generate new transient account pairs for every app deployment
 current_account = Account()
 
@@ -30,6 +32,34 @@ def hello():
 
 @app.route("/compile", methods=["POST"])
 def compile():
+    # print(f"compiling {request.data}")
+    # Set CORS headers for the main request
+    headers = {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+    }
+
+    try:
+        body = json.loads(request.data, strict=False)
+        body = body["body"]
+    except:
+        return Response("Bad Request in body", status=400)
+    try:
+        compiled_source = compile_pyteal.raw_compile(body)
+        return Response(
+            f"Compilation successful: {compiled_source}", status=200, headers=headers
+        )
+    except Exception as e:
+        return Response(
+            "Bad Approval program; could not compile PyTeal",
+            status=400,
+            headers=headers,
+        )
+
+
+@app.route("/compile-file", methods=["POST"])
+def compile_file():
     file = request.files["file"]
     body = file.read()
     try:
