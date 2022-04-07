@@ -6,7 +6,7 @@ import sandbox_utils
 
 # Temporary file suffix
 count = 0
-MAX_FILE_COUNT = 100
+MAX_FILE_COUNT = 10  # Store 10 files at most in server
 
 
 def application(pyteal: Expr) -> str:

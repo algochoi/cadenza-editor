@@ -1,10 +1,11 @@
-from flask import Flask, Response, jsonify, request, render_template
+import base64
+import json
+
+from flask import Flask, Response, jsonify, render_template, request
 from flask_cors import CORS
-import json, os
 
 import compile_pyteal
 import sandbox_utils
-
 
 app = Flask(__name__)
 CORS(app, resources=r"/*")
@@ -52,12 +53,14 @@ def compile():
         return Response("Bad Request in body", status=400)
     try:
         compiled_source = compile_pyteal.raw_compile(body)
+        b64encoded = base64.b64encode(compiled_source)
         return Response(
-            f"Compilation successful: {compiled_source}", status=200, headers=headers
+            f"Compilation successful: {b64encoded}", status=200, headers=headers
         )
     except Exception as e:
+        print(e)
         return Response(
-            "Bad Approval program; could not compile PyTeal",
+            f"Could not compile PyTeal: {e}",
             status=400,
             headers=headers,
         )
@@ -76,6 +79,34 @@ def compile_file():
 
 @app.route("/deploy", methods=["POST"])
 def deploy_app():
+    global current_account
+
+    # Set CORS headers for the main request
+    headers = {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+    }
+
+    try:
+        body = json.loads(request.data, strict=False)
+        body = body["body"]
+    except:
+        return Response("Bad Request in body", status=400)
+
+    client = sandbox_utils.create_algod_client()
+    current_account.generate_transient_account(client)
+    compiled_source = compile_pyteal.raw_compile(body)
+
+    resp = sandbox_utils.deploy_app(
+        client, compiled_source, current_account.sk, current_account.pk
+    )
+
+    return resp
+
+
+@app.route("/deploy-file", methods=["POST"])
+def deploy_app_from_file():
     global current_account
 
     file = request.files["file"]
