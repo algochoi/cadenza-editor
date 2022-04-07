@@ -24,7 +24,9 @@ def event(
     )
 
 def approval():
-    return event(init=Seq([Approve()]))
+    return event(init=Seq([
+        Approve()
+    ]))
 `;
 const consoleMessages = [];
 
@@ -37,12 +39,13 @@ const editorLib = {
         });
 
         editor.setValue(defaultCode)
+        this.outputConsole(`double click to clear the console logs`);
     },
 
     outputConsole(text) {
         consoleMessages.push({
             text
-        })
+        });
 
         const newLog = document.createElement('li');
         const newLogText = document.createElement('pre');
