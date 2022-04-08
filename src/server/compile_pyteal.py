@@ -14,6 +14,17 @@ def application(pyteal: Expr) -> str:
     return compileTeal(pyteal, mode=Mode.Application, version=MAX_TEAL_VERSION)
 
 
+# Naively sanitize user input code and raise exception if user is doing
+# something suspicious.
+def sanitize_code(user_code: str):
+    bad_commands = [" os.", " sys."]
+
+    for command in bad_commands:
+        if command in user_code:
+            print(f"User attemped to use: {command}")
+            raise Exception("Sorry, we don't support that command!")
+
+
 # Creates a temp PyTeal file and saves to temp folder.
 def process_pyteal(raw_pyteal: bytes) -> str:
     global count
@@ -22,6 +33,9 @@ def process_pyteal(raw_pyteal: bytes) -> str:
         decoded = raw_pyteal.decode("utf-8")
     fname = f"temp_pyteal_{count%MAX_FILE_COUNT}"
     count += 1
+
+    # Sanitize input, and if bad, raise exception
+    sanitize_code(decoded)
 
     # Create temp directory (mkdir -p)
     try:
