@@ -17,7 +17,19 @@ def application(pyteal: Expr) -> str:
 # Naively sanitize user input code and raise exception if user is doing
 # something suspicious.
 def sanitize_code(user_code: str):
-    bad_commands = [" os.", " sys."]
+    bad_commands = [
+        " os.",
+        " sys.",
+        " subprocess.",
+        " asyncio.",
+        "exec(",
+        "eval(",
+        " logging.",
+        " code.",
+        "_xxsubinterpreters.",
+        "_testcapi.",
+        ".__",
+    ]
 
     for command in bad_commands:
         if command in user_code:
