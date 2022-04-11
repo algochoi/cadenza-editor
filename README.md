@@ -9,6 +9,8 @@ cadenza is a browser based [pyteal](https://github.com/algorand/pyteal) editor &
 
 it can currently deploy stateful apps as well, but there is no UI feature to interact with them (yet!).
 
+[live demo here](http://35.222.183.190:5000/): but it is probably better to run it locally and consider it as a UI to your sandbox for now.
+
 ## installation
 
 ### tldr
@@ -32,4 +34,8 @@ clone this repo, go into the `src/server` directory, then `pip install -r requir
 ![cadenza architecture](https://user-images.githubusercontent.com/86622919/162258699-9708ea60-6c79-44f0-ae16-fdbab13881bb.png)
 
 ## bugs 🐞
-use at your own risk! report them to [me](https://github.com/algochoi) on github or open up an issue in the repo 🎶.
+use at your own risk! 
+
+report them to [me](https://github.com/algochoi) on github or open up an issue in the repo 🎶. 
+
+pr's are always welcomed 🎼
