@@ -38,31 +38,24 @@ def hello():
 
 @app.route("/compile", methods=["POST"])
 def compile():
-    # print(f"compiling {request.data}")
-    # Set CORS headers for the main request
-    headers = {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-    }
-
+    # Parse the incoming request.
+    # The PyTeal code is sent as text in the body field.
     try:
         body = json.loads(request.data, strict=False)
         body = body["body"]
     except:
         return Response("Bad Request in body", status=400)
+
+    # Try to compile the PyTeal code, and if it fails, return the error.
     try:
         compiled_source = compile_pyteal.raw_compile(body)
         b64encoded = base64.b64encode(compiled_source)
-        return Response(
-            f"Compilation successful: {b64encoded}", status=200, headers=headers
-        )
+        return Response(f"Compilation successful: {b64encoded}", status=200)
     except Exception as e:
         print(e)
         return Response(
             f"Could not compile PyTeal: {e}",
             status=400,
-            headers=headers,
         )
 
 

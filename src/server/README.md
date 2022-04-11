@@ -1,4 +1,4 @@
-# Cadenza PyTeal Compiler
+# cadenza: PyTeal Compiler
 
 ## Installation
 It is recommended to use a virtual environment like `venv`.
