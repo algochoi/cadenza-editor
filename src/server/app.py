@@ -74,13 +74,6 @@ def compile_file():
 def deploy_app():
     global current_account
 
-    # Set CORS headers for the main request
-    headers = {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-    }
-
     try:
         body = json.loads(request.data, strict=False)
         body = body["body"]
