@@ -4,7 +4,9 @@ const consoleLogList = document.querySelector('.editor__console-logs');
 
 
 const editor = ace.edit("editor");
-const defaultCode = `from pyteal import *
+const viewer = ace.edit("viewer");
+
+const defaultPyteal = `from pyteal import *
 
 def event(
     init: Expr = Reject(),
@@ -28,17 +30,30 @@ def approval():
         Approve()
     ]))
 `;
+
+const defaultTeal = `#pragma version 5
+int 1
+return
+`
+
 const consoleMessages = [];
 
 const editorLib = {
     init() {
-        editor.session.setMode("ace/mode/python");
+        editor.getSession().setMode("ace/mode/python");
 
         editor.setOptions({
             enableBasicAutocompletion: true,
         });
 
-        editor.setValue(defaultCode)
+        viewer.getSession().setMode("ace/mode/python")
+        viewer.setReadOnly(true);
+
+        viewer.setValue(defaultTeal)
+        editor.setValue(defaultPyteal)
+        console.log(editor.getValue())
+        console.log(viewer.getValue())
+
         this.outputConsole(`double click to clear the console logs`);
     },
 

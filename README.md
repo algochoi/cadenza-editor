@@ -15,7 +15,17 @@ it can currently deploy stateful apps as well, but there is no UI feature to int
 
 ### tldr
 
-clone this repo, go into the `src/server` directory, then `pip install -r requirements.txt`. you can locally start your server by `flask run`, and you'll see the editor on localhost port 5000. in order to compile and deploy apps, you need to have [sandbox](https://github.com/algorand/sandbox) running. 
+Make sure you have [sandbox](https://github.com/algorand/sandbox) running. 
+
+- clone this repo
+- `cd src/server` 
+- `python -m venv .venv`
+- `source .venv/bin/activate`
+- `pip install -r requirements.txt`
+- Start the server with `python app.py` or `flask run --host=0.0.0.0`
+
+Now you should see the editor at `http://localhost:5000`. 
+
 
 ## how do i use it?
 * you can use the editor to input your own pyteal code.
