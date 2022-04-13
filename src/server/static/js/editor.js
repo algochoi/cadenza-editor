@@ -99,7 +99,6 @@ compileCodeBtn.addEventListener('click', () => {
                 "Accept": "application/json",
             },
             method: "POST",
-            // mode: 'no-cors',
         }).then(response => response.text())
         .then(response => {
             console.log(response)
@@ -126,7 +125,6 @@ deployCodeBtn.addEventListener('click', () => {
                 "Accept": "application/json",
             },
             method: "POST",
-            // mode: 'no-cors',
         }).then(response => response.text())
         .then(response => {
             console.log(response)
@@ -139,7 +137,6 @@ deployCodeBtn.addEventListener('click', () => {
 
 consoleLogList.addEventListener('dblclick', () => {
     // Clear the logs if double clicked
-    console.log("Clear");
     editorLib.clearConsole();
 });
 
