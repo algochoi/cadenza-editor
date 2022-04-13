@@ -13,8 +13,6 @@ it can currently deploy stateful apps as well, but there is no UI feature to int
 
 ## installation
 
-### tldr
-
 Make sure you have [sandbox](https://github.com/algorand/sandbox) running. 
 
 - clone this repo
