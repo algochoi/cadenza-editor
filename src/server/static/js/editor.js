@@ -31,7 +31,48 @@ def approval():
     ]))
 `;
 
-const defaultTeal = `#pragma version 5
+const defaultTeal = `#pragma version 6
+txn ApplicationID
+int 0
+==
+bnz main_l12
+txn OnCompletion
+int DeleteApplication
+==
+bnz main_l11
+txn OnCompletion
+int UpdateApplication
+==
+bnz main_l10
+txn OnCompletion
+int OptIn
+==
+bnz main_l9
+txn OnCompletion
+int CloseOut
+==
+bnz main_l8
+txn OnCompletion
+int NoOp
+==
+bnz main_l7
+err
+main_l7:
+int 0
+return
+main_l8:
+int 0
+return
+main_l9:
+int 0
+return
+main_l10:
+int 0
+return
+main_l11:
+int 0
+return
+main_l12:
 int 1
 return
 `
@@ -42,17 +83,17 @@ const editorLib = {
     init() {
         editor.getSession().setMode("ace/mode/python");
 
+        //TODO: can we define our own mode? formatting? syntax highlighting?
+        viewer.getSession().setMode("ace/mode/python");
+
         editor.setOptions({
             enableBasicAutocompletion: true,
         });
 
-        viewer.getSession().setMode("ace/mode/python")
         viewer.setReadOnly(true);
 
-        viewer.setValue(defaultTeal)
         editor.setValue(defaultPyteal)
-        console.log(editor.getValue())
-        console.log(viewer.getValue())
+        viewer.setValue(defaultTeal)
 
         this.outputConsole(`double click to clear the console logs`);
     },
@@ -88,7 +129,7 @@ compileCodeBtn.addEventListener('click', () => {
 
     console.log(userCode);
 
-    fetch("http://0.0.0.0:5000/compile", {
+    fetch("/compile", {
             body: JSON.stringify({
                 "body": userCode,
             }),
@@ -101,7 +142,10 @@ compileCodeBtn.addEventListener('click', () => {
             method: "POST",
         }).then(response => response.text())
         .then(response => {
-            console.log(response)
+            parsed = JSON.parse(response)
+            console.log(parsed)
+
+            viewer.setValue(parsed['teal'])
             editorLib.outputConsole(response)
         }).catch(err => {
             console.log(err.name);
@@ -114,7 +158,7 @@ deployCodeBtn.addEventListener('click', () => {
 
     console.log(userCode);
 
-    fetch("http://0.0.0.0:5000/deploy", {
+    fetch("/deploy", {
             body: JSON.stringify({
                 "body": userCode,
             }),

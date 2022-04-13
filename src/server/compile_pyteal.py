@@ -80,4 +80,4 @@ def raw_compile(raw_pyteal: bytes):
     except Exception as e:
         raise e
 
-    return source_program
+    return teal_code, source_program
