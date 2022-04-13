@@ -4,6 +4,7 @@ import json
 from flask import Flask, Response, jsonify, render_template, request
 from flask_cors import CORS
 
+import application_call
 import compile_pyteal
 import sandbox_utils
 
@@ -48,7 +49,7 @@ def compile():
 
     # Try to compile the PyTeal code, and if it fails, return the error.
     try:
-        compiled_source = compile_pyteal.raw_compile(body)
+        compiled_source = compile_pyteal.compile_pyteal(body)
         b64encoded = base64.b64encode(compiled_source)
         return Response(f"Compilation successful: {b64encoded}", status=200)
     except Exception as e:
@@ -64,7 +65,7 @@ def compile_file():
     file = request.files["file"]
     body = file.read()
     try:
-        compiled_source = compile_pyteal.raw_compile(body)
+        compiled_source = compile_pyteal.compile_raw_pyteal(body)
         return Response(f"Compilation successful: {compiled_source}", status=200)
     except Exception as e:
         return Response("Bad Approval program; could not compile PyTeal", status=400)
@@ -82,9 +83,9 @@ def deploy_app():
 
     client = sandbox_utils.create_algod_client()
     current_account.generate_transient_account(client)
-    compiled_source = compile_pyteal.raw_compile(body)
+    compiled_source = compile_pyteal.compile_pyteal(body)
 
-    resp = sandbox_utils.deploy_app(
+    resp = application_call.deploy_app(
         client, compiled_source, current_account.sk, current_account.pk
     )
 
@@ -100,9 +101,9 @@ def deploy_app_from_file():
 
     client = sandbox_utils.create_algod_client()
     current_account.generate_transient_account(client)
-    compiled_source = compile_pyteal.raw_compile(body)
+    compiled_source = compile_pyteal.compile_raw_pyteal(body)
 
-    resp = sandbox_utils.deploy_app(
+    resp = application_call.deploy_app(
         client, compiled_source, current_account.sk, current_account.pk
     )
 

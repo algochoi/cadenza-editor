@@ -12,7 +12,7 @@ def test_compile_success():
         ),
     ]
     for test in test_cases_good:
-        output = compile_pyteal.raw_compile(test[0])
+        output = compile_pyteal.compile_pyteal(test[0])
         assert output == test[1]
 
 
@@ -26,4 +26,4 @@ def test_compile_fail():
     ]
     for test in test_cases_bad:
         with pytest.raises(test[1]) as e:
-            output = compile_pyteal.raw_compile(test[0])
+            output = compile_pyteal.compile_pyteal(test[0])

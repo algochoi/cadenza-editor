@@ -1,7 +1,10 @@
+import base64
 import importlib
 import os
+from typing import Union
 
-from pyteal import *
+from algosdk.v2client import algod
+from pyteal import MAX_TEAL_VERSION, Expr, Mode, compileTeal
 
 import sandbox_utils
 
@@ -10,13 +13,13 @@ count = 0
 MAX_FILE_COUNT = 1000  # Store 1000 files at most in server
 
 
-def application(pyteal: Expr) -> str:
-    return compileTeal(pyteal, mode=Mode.Application, version=MAX_TEAL_VERSION)
+def application(pyteal_code: Expr) -> str:
+    return compileTeal(pyteal_code, mode=Mode.Application, version=MAX_TEAL_VERSION)
 
 
 # Naively sanitize user input code and raise exception if user is doing
 # something suspicious.
-def sanitize_code(user_code: str):
+def sanitize_code(user_code: str) -> None:
     bad_commands = [
         " os.",
         " sys.",
@@ -38,7 +41,7 @@ def sanitize_code(user_code: str):
 
 
 # Creates a temp PyTeal file and saves to temp folder.
-def process_pyteal(raw_pyteal: bytes) -> str:
+def process_pyteal(raw_pyteal: Union[str, bytes]) -> str:
     global count
     decoded = raw_pyteal
     if isinstance(raw_pyteal, bytes):
@@ -61,8 +64,8 @@ def process_pyteal(raw_pyteal: bytes) -> str:
     return fname
 
 
-def raw_compile(raw_pyteal: bytes):
-    fname = process_pyteal(raw_pyteal)
+def compile_pyteal(pyteal_code: str) -> bytes:
+    fname = process_pyteal(pyteal_code)
 
     # Try compiling pyteal
     teal_code = ""
@@ -76,8 +79,18 @@ def raw_compile(raw_pyteal: bytes):
     # Try compiling TEAL
     try:
         client = sandbox_utils.create_algod_client()
-        source_program = sandbox_utils.compile_program(client, teal_code)
+        source_program = compile_program(client, teal_code)
     except Exception as e:
         raise e
 
     return source_program
+
+
+def compile_raw_pyteal(raw_pyteal: bytes) -> bytes:
+    source_code = raw_pyteal.decode("utf-8")
+    return compile_pyteal(source_code)
+
+
+def compile_program(client: algod.AlgodClient, source_code: str) -> bytes:
+    compile_response = client.compile(source_code)
+    return base64.b64decode(compile_response["result"])
