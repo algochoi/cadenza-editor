@@ -66,17 +66,6 @@ h1 {
 }
 
 .editor__btn {
-  border: 0;
-  padding: 0.5em;
-  background-color: #fff;
-  border: 2px solid #333;
-  margin-top: 1em;
-  width: 100px;
-  cursor: pointer;
-}
-
-/* CSS */
-.button-30 {
   align-items: center;
   appearance: none;
   background-color: #fcfcfd;
@@ -108,18 +97,18 @@ h1 {
   font-size: 18px;
 }
 
-.button-30:focus {
+.editor__btn:focus {
   box-shadow: #d6d6e7 0 0 0 1.5px inset, rgba(45, 35, 66, 0.4) 0 2px 4px,
     rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #d6d6e7 0 -3px 0 inset;
 }
 
-.button-30:hover {
+.editor__btn:hover {
   box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px,
     rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #d6d6e7 0 -3px 0 inset;
   transform: translateY(-2px);
 }
 
-.button-30:active {
+.editor__btn:active {
   box-shadow: #d6d6e7 0 3px 7px inset;
   transform: translateY(2px);
 }
