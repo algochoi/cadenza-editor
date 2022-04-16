@@ -1,7 +1,7 @@
 import base64
 import importlib
 import os
-from typing import Union
+from typing import Tuple, Union
 
 from algosdk.v2client import algod
 from pyteal import MAX_TEAL_VERSION, Expr, Mode, compileTeal
@@ -64,7 +64,7 @@ def process_pyteal(raw_pyteal: Union[str, bytes]) -> str:
     return fname
 
 
-def compile_pyteal(pyteal_code: str) -> bytes:
+def compile_pyteal(pyteal_code: str) -> Tuple[str, bytes]:
     fname = process_pyteal(pyteal_code)
 
     # Try compiling pyteal
@@ -83,12 +83,12 @@ def compile_pyteal(pyteal_code: str) -> bytes:
     except Exception as e:
         raise e
 
-    return source_program
+    return teal_code, source_program
 
 
 def compile_raw_pyteal(raw_pyteal: bytes) -> bytes:
     source_code = raw_pyteal.decode("utf-8")
-    return compile_pyteal(source_code)
+    return compile_pyteal(source_code)[1]
 
 
 def compile_program(client: algod.AlgodClient, source_code: str) -> bytes:

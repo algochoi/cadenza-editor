@@ -37,6 +37,10 @@ def hello():
     return jsonify({"body": "Hello, from Cadenza!"})
 
 
+def json_result(compiled: str, teal: str) -> str:
+    return json.dumps({"result": compiled, "teal": teal})
+
+
 @app.route("/compile", methods=["POST"])
 def compile():
     # Parse the incoming request.
@@ -49,9 +53,9 @@ def compile():
 
     # Try to compile the PyTeal code, and if it fails, return the error.
     try:
-        compiled_source = compile_pyteal.compile_pyteal(body)
-        b64encoded = base64.b64encode(compiled_source)
-        return Response(f"Compilation successful: {b64encoded}", status=200)
+        teal_source, compiled_source = compile_pyteal.compile_pyteal(body)
+        b64encoded = base64.b64encode(compiled_source).decode("utf8")
+        return Response(json_result(b64encoded, teal_source), status=200)
     except Exception as e:
         print(e)
         return Response(
@@ -65,8 +69,8 @@ def compile_file():
     file = request.files["file"]
     body = file.read()
     try:
-        compiled_source = compile_pyteal.compile_raw_pyteal(body)
-        return Response(f"Compilation successful: {compiled_source}", status=200)
+        teal_source, compiled_source = compile_pyteal.compile_pyteal(body)
+        return Response(json_result(compiled_source, teal_source), status=200)
     except Exception as e:
         return Response("Bad Approval program; could not compile PyTeal", status=400)
 
@@ -83,7 +87,7 @@ def deploy_app():
 
     client = sandbox_utils.create_algod_client()
     current_account.generate_transient_account(client)
-    compiled_source = compile_pyteal.compile_pyteal(body)
+    _, compiled_source = compile_pyteal.compile_pyteal(body)
 
     resp = application_call.deploy_app(
         client, compiled_source, current_account.sk, current_account.pk
@@ -101,7 +105,7 @@ def deploy_app_from_file():
 
     client = sandbox_utils.create_algod_client()
     current_account.generate_transient_account(client)
-    compiled_source = compile_pyteal.compile_raw_pyteal(body)
+    _, compiled_source = compile_pyteal.compile_pyteal(body)
 
     resp = application_call.deploy_app(
         client, compiled_source, current_account.sk, current_account.pk
