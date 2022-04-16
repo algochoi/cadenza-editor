@@ -55,11 +55,11 @@ def compile():
     try:
         teal_source, compiled_source = compile_pyteal.compile_pyteal(body)
         b64encoded = base64.b64encode(compiled_source).decode("utf8")
-        return Response(json_result(b64encoded, teal_source), status=200)
+        compiled_source = f"Compilation successful: {b64encoded}"
+        return Response(json_result(compiled_source, teal_source), status=200)
     except Exception as e:
-        print(e)
         return Response(
-            f"Could not compile PyTeal: {e}",
+            json_result(f"Could not compile PyTeal: {e}", ""),
             status=400,
         )
 
@@ -70,6 +70,7 @@ def compile_file():
     body = file.read()
     try:
         teal_source, compiled_source = compile_pyteal.compile_pyteal(body)
+        compiled_source = f"Compilation successful: {compiled_source}"
         return Response(json_result(compiled_source, teal_source), status=200)
     except Exception as e:
         return Response("Bad Approval program; could not compile PyTeal", status=400)
@@ -85,15 +86,20 @@ def deploy_app():
     except:
         return Response("Bad Request in body", status=400)
 
-    client = sandbox_utils.create_algod_client()
-    current_account.generate_transient_account(client)
-    _, compiled_source = compile_pyteal.compile_pyteal(body)
+    try:
+        client = sandbox_utils.create_algod_client()
+        current_account.generate_transient_account(client)
+        _, compiled_source = compile_pyteal.compile_pyteal(body)
 
-    resp = application_call.deploy_app(
-        client, compiled_source, current_account.sk, current_account.pk
-    )
-
-    return resp
+        resp = application_call.deploy_app(
+            client, compiled_source, current_account.sk, current_account.pk
+        )
+        return resp
+    except Exception as e:
+        return Response(
+            json_result(f"Could not deploy PyTeal: {e}", ""),
+            status=400,
+        )
 
 
 @app.route("/deploy-file", methods=["POST"])
@@ -111,7 +117,7 @@ def deploy_app_from_file():
         client, compiled_source, current_account.sk, current_account.pk
     )
 
-    return resp
+    return Response(resp, status=200)
 
 
 if __name__ == "__main__":
