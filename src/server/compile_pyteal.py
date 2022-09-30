@@ -4,7 +4,7 @@ import os
 from typing import Tuple, Union
 
 from algosdk.v2client import algod
-from pyteal import MAX_TEAL_VERSION, Expr, Mode, compileTeal
+from pyteal import MAX_TEAL_VERSION, Expr, Mode, Router, compileTeal
 
 import sandbox_utils
 
@@ -13,8 +13,16 @@ count = 0
 MAX_FILE_COUNT = 1000  # Store 1000 files at most in server
 
 
+# Old way of compiling pyteal through the approval() entry method.
 def application(pyteal_code: Expr) -> str:
     return compileTeal(pyteal_code, mode=Mode.Application, version=MAX_TEAL_VERSION)
+
+
+# Newer way of compiler pyteal through the Router object.
+# TODO: Allow users to optionally use router to compile contracts.
+def compile_router(router: Router) -> str:
+    approval_program, _, _ = router.compile_program(version=MAX_TEAL_VERSION)
+    return approval_program
 
 
 # Naively sanitize user input code and raise exception if user is doing
@@ -64,6 +72,16 @@ def process_pyteal(raw_pyteal: Union[str, bytes]) -> str:
     return fname
 
 
+def compile_raw_pyteal(raw_pyteal: bytes) -> bytes:
+    source_code = raw_pyteal.decode("utf-8")
+    return compile_pyteal(source_code)[1]
+
+
+def compile_program(client: algod.AlgodClient, source_code: str) -> bytes:
+    compile_response = client.compile(source_code)
+    return base64.b64decode(compile_response["result"])
+
+
 def compile_pyteal(pyteal_code: str) -> Tuple[str, bytes]:
     fname = process_pyteal(pyteal_code)
 
@@ -72,7 +90,7 @@ def compile_pyteal(pyteal_code: str) -> Tuple[str, bytes]:
     try:
         mod_name = f"temp.{fname}"
         temp_pyteal = importlib.import_module(mod_name)
-        teal_code = application(temp_pyteal.approval())
+        teal_code = compile_router(temp_pyteal.router)
     except Exception as e:
         raise e
 
@@ -84,13 +102,3 @@ def compile_pyteal(pyteal_code: str) -> Tuple[str, bytes]:
         raise e
 
     return teal_code, source_program
-
-
-def compile_raw_pyteal(raw_pyteal: bytes) -> bytes:
-    source_code = raw_pyteal.decode("utf-8")
-    return compile_pyteal(source_code)[1]
-
-
-def compile_program(client: algod.AlgodClient, source_code: str) -> bytes:
-    compile_response = client.compile(source_code)
-    return base64.b64decode(compile_response["result"])
