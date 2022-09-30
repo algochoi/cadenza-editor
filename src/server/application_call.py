@@ -2,7 +2,13 @@ from algosdk.future import transaction
 from algosdk.v2client import algod
 
 
-def deploy_app(client: algod.AlgodClient, source_program: bytes, sk: str, pk: str):
+def deploy_app(
+    client: algod.AlgodClient,
+    source_program: bytes,
+    clear_program: bytes,
+    sk: str,
+    pk: str,
+):
     params = client.suggested_params()
     global_schema = transaction.StateSchema(5, 5)
     local_schema = transaction.StateSchema(5, 5)
@@ -12,7 +18,7 @@ def deploy_app(client: algod.AlgodClient, source_program: bytes, sk: str, pk: st
     # account if you wish to run this script many times.
     private_key, sender = sk, pk
 
-    clear_program = b"\x06\x81\x01C"
+    # clear_program = b"\x06\x81\x01C"
 
     # Create an unsigned transaction
     txn = transaction.ApplicationCreateTxn(

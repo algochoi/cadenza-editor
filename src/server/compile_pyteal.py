@@ -20,9 +20,11 @@ def application(pyteal_code: Expr) -> str:
 
 # Newer way of compiler pyteal through the Router object.
 # TODO: Allow users to optionally use router to compile contracts.
-def compile_router(router: Router) -> str:
-    approval_program, _, _ = router.compile_program(version=MAX_TEAL_VERSION)
-    return approval_program
+def compile_router(router: Router) -> Tuple[str, str]:
+    approval_program, clear_program, _ = router.compile_program(
+        version=MAX_TEAL_VERSION
+    )
+    return approval_program, clear_program
 
 
 # Naively sanitize user input code and raise exception if user is doing
@@ -82,7 +84,7 @@ def compile_program(client: algod.AlgodClient, source_code: str) -> bytes:
     return base64.b64decode(compile_response["result"])
 
 
-def compile_pyteal(pyteal_code: str) -> Tuple[str, bytes]:
+def compile_pyteal(pyteal_code: str) -> Tuple[str, bytes, bytes]:
     fname = process_pyteal(pyteal_code)
 
     # Try compiling pyteal
@@ -90,15 +92,16 @@ def compile_pyteal(pyteal_code: str) -> Tuple[str, bytes]:
     try:
         mod_name = f"temp.{fname}"
         temp_pyteal = importlib.import_module(mod_name)
-        teal_code = compile_router(temp_pyteal.router)
+        teal_approve_code, teal_clear_code = compile_router(temp_pyteal.router)
     except Exception as e:
         raise e
 
     # Try compiling TEAL
     try:
         client = sandbox_utils.create_algod_client()
-        source_program = compile_program(client, teal_code)
+        source_program = compile_program(client, teal_approve_code)
+        clear_program = compile_program(client, teal_clear_code)
     except Exception as e:
         raise e
 
-    return teal_code, source_program
+    return teal_approve_code, source_program, clear_program

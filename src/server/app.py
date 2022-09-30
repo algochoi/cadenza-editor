@@ -53,9 +53,10 @@ def compile():
 
     # Try to compile the PyTeal code, and if it fails, return the error.
     try:
-        teal_source, compiled_source = compile_pyteal.compile_pyteal(body)
-        b64encoded = base64.b64encode(compiled_source).decode("utf8")
-        compiled_source = f"Compilation successful: {b64encoded}"
+        teal_source, compiled_source, clear_source = compile_pyteal.compile_pyteal(body)
+        b64encoded_approval = base64.b64encode(compiled_source).decode("utf8")
+        b64encoded_clear = base64.b64encode(clear_source).decode("utf8")
+        compiled_source = f"Compilation successful for approval program: {b64encoded_approval} and clear state program: {b64encoded_clear}"
         return Response(json_result(compiled_source, teal_source), status=200)
     except Exception as e:
         return Response(
@@ -69,7 +70,7 @@ def compile_file():
     file = request.files["file"]
     body = file.read()
     try:
-        teal_source, compiled_source = compile_pyteal.compile_pyteal(body)
+        teal_source, compiled_source, _ = compile_pyteal.compile_pyteal(body)
         compiled_source = f"Compilation successful: {compiled_source}"
         return Response(json_result(compiled_source, teal_source), status=200)
     except Exception as e:
@@ -89,10 +90,14 @@ def deploy_app():
     try:
         client = sandbox_utils.create_algod_client()
         current_account.generate_transient_account(client)
-        _, compiled_source = compile_pyteal.compile_pyteal(body)
+        _, compiled_source, clear_source = compile_pyteal.compile_pyteal(body)
 
         resp = application_call.deploy_app(
-            client, compiled_source, current_account.sk, current_account.pk
+            client,
+            compiled_source,
+            clear_source,
+            current_account.sk,
+            current_account.pk,
         )
         return resp
     except Exception as e:
@@ -111,10 +116,10 @@ def deploy_app_from_file():
 
     client = sandbox_utils.create_algod_client()
     current_account.generate_transient_account(client)
-    _, compiled_source = compile_pyteal.compile_pyteal(body)
+    _, compiled_source, clear_source = compile_pyteal.compile_pyteal(body)
 
     resp = application_call.deploy_app(
-        client, compiled_source, current_account.sk, current_account.pk
+        client, compiled_source, clear_source, current_account.sk, current_account.pk
     )
 
     return Response(resp, status=200)
