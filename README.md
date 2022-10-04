@@ -28,8 +28,7 @@ Now you should see the editor at `http://localhost:5000`.
 ## how do i use it?
 * you can use the editor to input your own pyteal code.
 * there is some default boilerplate code available for you, and you can find more useful utils at the [pyteal-utils](https://github.com/algorand/pyteal-utils) repo. 
-* pyteal written in cadenza **must** have the `approval()` function as the entry point for stateful apps.
-* the clear program is always defined to be `int 1`.
+* pyteal written in cadenza **must** have the `router` object as the entry point for stateful apps, and the approval and clear state program will automatically be generated from this.
 * the compiler always compiles to the latest pyteal version available.
 * compile button tries to compile the pyteal and upon success, returns the base64 encoding of the program.
 * deploy button tries to compile and deploy the program on a private network on sandbox (on dev mode, so consensus and block finality is immediate!), and upon success, returns the application creation response.
@@ -40,6 +39,10 @@ Now you should see the editor at `http://localhost:5000`.
 * backend: python & flask, with help from pyteal, py-algorand-sdk, and sandbox
 
 ![cadenza architecture](https://user-images.githubusercontent.com/86622919/162258699-9708ea60-6c79-44f0-ae16-fdbab13881bb.png)
+
+## tests
+there aren't that many tests right now, but you can run them by booting up a default sandbox instance and running:
+`python -m pytest`
 
 ## bugs 🐞
 use at your own risk! 

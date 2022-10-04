@@ -8,73 +8,47 @@ const viewer = ace.edit("viewer");
 
 const defaultPyteal = `from pyteal import *
 
-def event(
-    init: Expr = Reject(),
-    delete: Expr = Reject(),
-    update: Expr = Reject(),
-    opt_in: Expr = Reject(),
-    close_out: Expr = Reject(),
-    no_op: Expr = Reject(),
-) -> Expr:
-    return Cond(
-        [Txn.application_id() == Int(0), init],
-        [Txn.on_completion() == OnComplete.DeleteApplication, delete],
-        [Txn.on_completion() == OnComplete.UpdateApplication, update],
-        [Txn.on_completion() == OnComplete.OptIn, opt_in],
-        [Txn.on_completion() == OnComplete.CloseOut, close_out],
-        [Txn.on_completion() == OnComplete.NoOp, no_op],
-    )
+pragma(compiler_version="^0.18.1")
 
+
+@Subroutine(TealType.none)
 def approval():
-    return event(init=Seq([
-        Approve()
-    ]))
+    return Approve()
+
+
+router = Router(
+  # Name of the contract
+  "Cadenza test contract",
+  # What to do for each on-complete type when no arguments are passed (bare call)
+  BareCallActions(
+      no_op=OnCompleteAction(action=approval, call_config=CallConfig.ALL),
+      clear_state=OnCompleteAction.call_only(Approve()),
+  ),
+)
 `;
 
-const defaultTeal = `#pragma version 6
-txn ApplicationID
+const defaultTeal = `#pragma version 7
+txn NumAppArgs
 int 0
 ==
-bnz main_l12
-txn OnCompletion
-int DeleteApplication
-==
-bnz main_l11
-txn OnCompletion
-int UpdateApplication
-==
-bnz main_l10
-txn OnCompletion
-int OptIn
-==
-bnz main_l9
-txn OnCompletion
-int CloseOut
-==
-bnz main_l8
+bnz main_l2
+err
+main_l2:
 txn OnCompletion
 int NoOp
 ==
-bnz main_l7
+bnz main_l4
 err
-main_l7:
-int 0
-return
-main_l8:
-int 0
-return
-main_l9:
-int 0
-return
-main_l10:
-int 0
-return
-main_l11:
-int 0
-return
-main_l12:
+main_l4:
+callsub approval_0
 int 1
 return
+
+// approval
+approval_0:
+int 1
+return
+
 `;
 
 const consoleMessages = [];
